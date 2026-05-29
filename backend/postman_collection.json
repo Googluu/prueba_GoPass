@@ -1,0 +1,200 @@
+{
+  "info": {
+    "name": "TaskFlow API",
+    "description": "API REST para la gestión de tareas por proyectos",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:3000/api" },
+    { "key": "project_id", "value": "" },
+    { "key": "task_id", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Health check",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/health"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Projects",
+      "item": [
+        {
+          "name": "GET all projects",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/projects",
+            "description": "Retorna todos los proyectos con conteo de tareas por estado"
+          }
+        },
+        {
+          "name": "GET project by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/projects/{{project_id}}",
+            "description": "Retorna un proyecto con sus estadísticas"
+          }
+        },
+        {
+          "name": "POST create project",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/projects",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Mi nuevo proyecto\",\n  \"description\": \"Descripción del proyecto\"\n}"
+            }
+          }
+        },
+        {
+          "name": "PUT update project",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/projects/{{project_id}}",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Nombre actualizado\",\n  \"description\": \"Nueva descripción\"\n}"
+            }
+          }
+        },
+        {
+          "name": "DELETE project",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/projects/{{project_id}}",
+            "description": "Elimina el proyecto y sus tareas en cascada"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tasks",
+      "item": [
+        {
+          "name": "GET tasks by project",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/projects/{{project_id}}/tasks",
+              "host": ["{{base_url}}"],
+              "path": ["projects", "{{project_id}}", "tasks"],
+              "query": [
+                { "key": "status", "value": "todo", "disabled": true },
+                { "key": "priority", "value": "high", "disabled": true }
+              ]
+            },
+            "description": "Filtra por ?status=todo|in_progress|done y ?priority=low|medium|high"
+          }
+        },
+        {
+          "name": "GET tasks by project (filtered)",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/projects/{{project_id}}/tasks?status=in_progress&priority=high",
+            "description": "Ejemplo de uso de filtros combinados"
+          }
+        },
+        {
+          "name": "POST create task",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/projects/{{project_id}}/tasks",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Implementar login\",\n  \"description\": \"Autenticación con JWT\",\n  \"priority\": \"high\",\n  \"due_date\": \"2024-03-01\"\n}"
+            }
+          }
+        },
+        {
+          "name": "PUT update task",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/tasks/{{task_id}}",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Implementar login actualizado\",\n  \"description\": \"JWT + refresh token\",\n  \"status\": \"in_progress\",\n  \"priority\": \"high\",\n  \"due_date\": \"2024-03-15\"\n}"
+            }
+          }
+        },
+        {
+          "name": "PATCH update task status",
+          "request": {
+            "method": "PATCH",
+            "url": "{{base_url}}/tasks/{{task_id}}/status",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"done\"\n}"
+            },
+            "description": "Actualiza solo el estado: todo | in_progress | done"
+          }
+        },
+        {
+          "name": "DELETE task",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/tasks/{{task_id}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Error cases",
+      "item": [
+        {
+          "name": "POST project - nombre vacío (400)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/projects",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"\"\n}"
+            }
+          }
+        },
+        {
+          "name": "POST project - nombre duplicado (409)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/projects",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"App E-commerce\"\n}"
+            }
+          }
+        },
+        {
+          "name": "GET project - no existe (404)",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/projects/00000000-0000-0000-0000-000000000000"
+          }
+        },
+        {
+          "name": "PATCH status - valor inválido (400)",
+          "request": {
+            "method": "PATCH",
+            "url": "{{base_url}}/tasks/{{task_id}}/status",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"invalid_status\"\n}"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
