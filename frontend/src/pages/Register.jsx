@@ -48,19 +48,22 @@ export default function Register() {
   const { signInWithGoogle, signUp } = useAuth();
   const navigate = useNavigate();
 
-  const [email, setEmail]       = useState('');
-  const [password, setPassword] = useState('');
-  const [showPw, setShowPw]     = useState(false);
-  const [agree, setAgree]       = useState(false);
-  const [loading, setLoading]   = useState(false);
-  const [error, setError]       = useState(null);
-  const [success, setSuccess]   = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+  const [email, setEmail]             = useState('');
+  const [password, setPassword]       = useState('');
+  const [confirm, setConfirm]         = useState('');
+  const [showPw, setShowPw]           = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [agree, setAgree]             = useState(false);
+  const [loading, setLoading]         = useState(false);
+  const [error, setError]             = useState(null);
+  const [success, setSuccess]         = useState(false);
+  const [submitted, setSubmitted]     = useState(false);
 
-  const strength    = scorePassword(password);
-  const emailErr    = submitted && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? 'Introduce un email válido.' : null;
-  const passwordErr = submitted && password.length < 8 ? 'Mínimo 8 caracteres.' : null;
-  const agreeErr    = submitted && !agree ? 'Debes aceptar los términos.' : null;
+  const strength     = scorePassword(password);
+  const emailErr     = submitted && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? 'Introduce un email válido.' : null;
+  const passwordErr  = submitted && password.length < 8 ? 'Mínimo 8 caracteres.' : null;
+  const confirmErr   = submitted && confirm !== password ? 'Las contraseñas no coinciden.' : null;
+  const agreeErr     = submitted && !agree ? 'Debes aceptar los términos.' : null;
 
   const handleGoogle = async () => {
     setError(null);
@@ -70,7 +73,7 @@ export default function Register() {
   const handleSubmit = async (e) => {
     e?.preventDefault();
     setSubmitted(true);
-    if (emailErr || passwordErr || !email || password.length < 8 || !agree) return;
+    if (emailErr || passwordErr || confirmErr || !email || password.length < 8 || confirm !== password || !agree) return;
     setLoading(true);
     setError(null);
     const { error: err } = await signUp(email, password);
@@ -207,6 +210,23 @@ export default function Register() {
                   </div>
                   {password && <StrengthMeter value={strength} />}
                   {passwordErr && <p className="mt-1.5 text-[11.5px] text-[#f87171] flex items-center gap-1"><AlertCircle className="w-3 h-3" />{passwordErr}</p>}
+                </label>
+
+                <label className="block">
+                  <span className="text-[12.5px] font-medium text-ink/90 mb-1.5 block">Confirmar contraseña <span className="text-[#f87171]">*</span></span>
+                  <div className="relative">
+                    <Lock className="w-4 h-4 text-mute absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <input type={showConfirm ? 'text' : 'password'} autoComplete="new-password"
+                      placeholder="Repite tu contraseña"
+                      value={confirm} onChange={e => setConfirm(e.target.value)}
+                      className={`w-full h-11 rounded-lg bg-bg/60 border ${confirmErr ? 'border-[#b13b3d]' : 'border-border'} focus:border-indigo-500 outline-none text-[14px] text-ink placeholder:text-mute pl-10 pr-11 transition-colors`}
+                    />
+                    <button type="button" onClick={() => setShowConfirm(v => !v)}
+                      className="absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 grid place-items-center rounded-md text-mute hover:text-ink hover:bg-white/5">
+                      {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                  {confirmErr && <p className="mt-1.5 text-[11.5px] text-[#f87171] flex items-center gap-1"><AlertCircle className="w-3 h-3" />{confirmErr}</p>}
                 </label>
 
                 <label className="flex items-start gap-2.5 mt-1 cursor-pointer select-none">

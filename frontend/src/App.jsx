@@ -48,7 +48,7 @@ export default function App() {
         <AuthProvider>
           <BrowserRouter>
             <Routes>
-              <Route path="/"         element={<Landing />} />
+              <Route path="/"         element={<GuestRoute><Landing /></GuestRoute>} />
               <Route path="/login"    element={<GuestRoute><Login /></GuestRoute>} />
               <Route path="/register" element={<GuestRoute><Register /></GuestRoute>} />
               <Route path="/*"        element={<WorkspaceRoutes />} />
