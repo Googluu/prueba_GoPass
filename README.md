@@ -21,6 +21,7 @@ Aplicación web de gestión de proyectos y tareas. Permite crear proyectos, orga
 - **Node.js** >= 18
 - **npm** >= 9
 - Cuenta en [Supabase](https://supabase.com) (plan gratuito es suficiente)
+- ```git clone git@github.com:Googluu/prueba_GoPass.git```
 
 ---
 
